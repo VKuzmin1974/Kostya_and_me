@@ -9,3 +9,8 @@
 ## добавление библиотек
 + pip3 install aiogram / pip3 install -r requirements.txt
 + pip3 freeze > requirements.txt
+
+## git
++ git commit -m "Message"
++ git push # to github
++ git pull # from github
