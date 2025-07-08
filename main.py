@@ -9,7 +9,8 @@ from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
 
-from weather import get_weather
+from weather import get_weather, get_weather_info
+
 
 # Bot token can be obtained via https://t.me/BotFather
 TOKEN = getenv("BOT_TOKEN")
@@ -41,7 +42,15 @@ async def calc_handler(message: Message) -> None:
 @dp.message(Command("weather"))
 async def weather_handler(message: Message) -> None:
     weather_data = get_weather()
-    await message.answer(f"Температура: {weather_data['temperature']}C, ветер: {weather_data['wind']} км/ч.")
+    await message.answer(f"Температура: {weather_data['temperature']}C, "
+                         f"ветер: {weather_data['wind']} км/ч.")
+
+
+@dp.message(Command("weather_info"))
+async def weather_info_handler(message: Message) -> None:
+    weather_data = get_weather_info()
+    await message.answer(f"Температура: {weather_data['temperature']}, "
+                         f"ветер: {weather_data['wind']}.")
 
 
 @dp.message()
