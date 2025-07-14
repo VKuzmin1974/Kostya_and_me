@@ -9,6 +9,7 @@ def get_time():
     current_month = current_date.strftime('%B')
     current_year = current_date.year
 
-    print(f"Сейчас {current_time.strftime('%H:%M:%S')}"
+    return (f"Сейчас {current_time.strftime('%H:%M:%S')}"
           f" {current_day} {current_month}"
           f" {current_year} года")
+
