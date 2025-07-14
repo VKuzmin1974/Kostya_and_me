@@ -1,6 +1,7 @@
 import locale
 from datetime import *
 
+
 def get_time():
     locale.setlocale(locale.LC_ALL, 'ru_RU')
     current_date = date.today()
@@ -10,6 +11,5 @@ def get_time():
     current_year = current_date.year
 
     return (f"Сейчас {current_time.strftime('%H:%M:%S')}"
-          f" {current_day} {current_month}"
-          f" {current_year} года")
-
+            f" {current_day} {current_month}"
+            f" {current_year} года")
