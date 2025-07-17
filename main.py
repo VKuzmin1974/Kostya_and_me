@@ -49,11 +49,11 @@ async def buttons_handler(message: Message) -> None:
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text="Кнопка 1",
-        callback_data="button1"
+        callback_data="button1",
     ))
     builder.add(types.InlineKeyboardButton(
         text="Яндекс",
-        url="https://ya.ru"  # Открывает ссылку
+        url="https://ya.ru",  # Открывает ссылку
     ))
     builder.adjust(2)  # 1 кнопка в строке (можно 2, 3...)
 
@@ -74,11 +74,11 @@ async def services_handler(message: Message) -> None:
     builder = InlineKeyboardBuilder()
     builder.add(types.InlineKeyboardButton(
         text="Погода",
-        callback_data="weather"
+        callback_data="weather",
     ))
     builder.add(types.InlineKeyboardButton(
         text="Время",
-        callback_data="time"
+        callback_data="time",
     ))
     builder.adjust(2)  # 1 кнопка в строке (можно 2, 3...)
 
@@ -93,7 +93,7 @@ async def handle_weather(callback: types.CallbackQuery):
     logging.info('выводим погоду')
     weather_data = get_weather_info()
     await callback.answer(f"Температура: {weather_data['temperature']}, "
-                         f"ветер: {weather_data['wind']}.", show_alert=True)
+                          f"ветер: {weather_data['wind']}.", show_alert=True)
 
 
 @dp.callback_query(F.data == "time")
