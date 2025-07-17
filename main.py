@@ -32,13 +32,8 @@ async def command_start_handler(message: Message) -> None:
     # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
     # method automatically or call API method directly via
     # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
-    logging.info(f"Зашел новый пользователь - {message.from_user.full_name}")
+    logging.info(f"Зашел новый пользователь - {message.from_user.full_name}, {message.from_user.id}")
     await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
-
-
-@dp.message(Command("calc"))
-async def calc_handler(message: Message) -> None:
-    await message.answer("Запускаю калькулятор. Введите математическое выражение")
 
 
 @dp.message(Command("weather"))
@@ -46,19 +41,6 @@ async def weather_handler(message: Message) -> None:
     weather_data = get_weather()
     await message.answer(f"Температура: {weather_data['temperature']}C, "
                          f"ветер: {weather_data['wind']} км/ч.")
-
-
-@dp.message(Command("weather_info"))
-async def weather_info_handler(message: Message) -> None:
-    weather_data = get_weather_info()
-    await message.answer(f"Температура: {weather_data['temperature']}, "
-                         f"ветер: {weather_data['wind']}.")
-
-
-@dp.message(Command("time"))
-async def my_time_handler(message: Message) -> None:
-    logging.info('запрос времени')
-    await message.answer(get_time())
 
 
 @dp.message(Command("buttons"))
@@ -84,6 +66,40 @@ async def buttons_handler(message: Message) -> None:
 @dp.callback_query(F.data == "button1")
 async def handle_button1(callback: types.CallbackQuery):
     await callback.answer("Вы нажали Кнопку 1!", show_alert=True)
+
+
+@dp.message(Command("services"))
+async def services_handler(message: Message) -> None:
+    logging.info('Показываем кнопки сервисов в сообщении')
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text="Погода",
+        callback_data="weather"
+    ))
+    builder.add(types.InlineKeyboardButton(
+        text="Время",
+        callback_data="time"
+    ))
+    builder.adjust(2)  # 1 кнопка в строке (можно 2, 3...)
+
+    await message.answer(
+        "Выберите сервис:",
+        reply_markup=builder.as_markup()
+    )
+
+
+@dp.callback_query(F.data == "weather")
+async def handle_weather(callback: types.CallbackQuery):
+    logging.info('выводим погоду')
+    weather_data = get_weather_info()
+    await callback.answer(f"Температура: {weather_data['temperature']}, "
+                         f"ветер: {weather_data['wind']}.", show_alert=True)
+
+
+@dp.callback_query(F.data == "time")
+async def handle_time(callback: types.CallbackQuery):
+    logging.info('выводим время')
+    await callback.message.answer(get_time())
 
 
 @dp.message()
