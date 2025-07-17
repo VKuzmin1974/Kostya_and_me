@@ -70,10 +70,10 @@ async def buttons_handler(message: Message) -> None:
         callback_data="button1"
     ))
     builder.add(types.InlineKeyboardButton(
-        text="Кнопка 2",
+        text="Яндекс",
         url="https://ya.ru"  # Открывает ссылку
     ))
-    builder.adjust(1)  # 1 кнопка в строке (можно 2, 3...)
+    builder.adjust(2)  # 1 кнопка в строке (можно 2, 3...)
 
     await message.answer(
         "Сообщение с inline-кнопками:",
