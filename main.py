@@ -2,12 +2,13 @@ import asyncio
 import logging
 import sys
 from os import getenv
-from aiogram import Bot, Dispatcher, html
+
+from aiogram import Bot, Dispatcher, F, html, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message
-
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from my_time import get_time
 from weather import get_weather, get_weather_info
@@ -58,6 +59,31 @@ async def weather_info_handler(message: Message) -> None:
 async def my_time_handler(message: Message) -> None:
     logging.info('запрос времени')
     await message.answer(get_time())
+
+
+@dp.message(Command("buttons"))
+async def buttons_handler(message: Message) -> None:
+    logging.info('Показываем кнопки в сообщении')
+    builder = InlineKeyboardBuilder()
+    builder.add(types.InlineKeyboardButton(
+        text="Кнопка 1",
+        callback_data="button1"
+    ))
+    builder.add(types.InlineKeyboardButton(
+        text="Кнопка 2",
+        url="https://ya.ru"  # Открывает ссылку
+    ))
+    builder.adjust(1)  # 1 кнопка в строке (можно 2, 3...)
+
+    await message.answer(
+        "Сообщение с inline-кнопками:",
+        reply_markup=builder.as_markup()
+    )
+
+
+@dp.callback_query(F.data == "button1")
+async def handle_button1(callback: types.CallbackQuery):
+    await callback.answer("Вы нажали Кнопку 1!", show_alert=True)
 
 
 @dp.message()
