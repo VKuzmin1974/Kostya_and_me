@@ -7,8 +7,9 @@ from aiogram import Bot, Dispatcher, F, html, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import Command, CommandStart
-from aiogram.types import Message
+from aiogram.types import KeyboardButton, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types.reply_keyboard_markup import ReplyKeyboardMarkup
 
 from my_time import get_time
 from weather import get_weather, get_weather_info
@@ -22,6 +23,12 @@ TOKEN = getenv("BOT_TOKEN")
 dp = Dispatcher()
 
 
+hello_button = KeyboardButton(text="привет")
+hello_button1 = KeyboardButton(text="пока")
+keyboard = ReplyKeyboardMarkup(keyboard=[[hello_button, hello_button1], [hello_button1]])
+
+
+
 @dp.message(CommandStart())
 async def command_start_handler(message: Message) -> None:
     """
@@ -33,7 +40,8 @@ async def command_start_handler(message: Message) -> None:
     # method automatically or call API method directly via
     # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
     logging.info(f"Зашел новый пользователь - {message.from_user.full_name}, {message.from_user.id}")
-    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!")
+    await message.answer(f"Hello, {html.bold(message.from_user.full_name)}!",
+                         reply_markup=keyboard)
 
 
 @dp.message(Command("weather"))
@@ -68,6 +76,7 @@ async def handle_button1(callback: types.CallbackQuery):
     await callback.answer("Вы нажали Кнопку 1!", show_alert=True)
 
 
+
 @dp.message(Command("services"))
 async def services_handler(message: Message) -> None:
     logging.info('Показываем кнопки сервисов в сообщении')
@@ -100,6 +109,21 @@ async def handle_weather(callback: types.CallbackQuery):
 async def handle_time(callback: types.CallbackQuery):
     logging.info('выводим время')
     await callback.message.answer(get_time())
+
+
+@dp.message(F.text.lower() == 'привет')
+async def hello_handler(message: Message) -> None:
+    await message.answer("Hello!")
+
+
+@dp.message(F.text.lower().contains('привет'))
+async def any_hello_handler(message: Message) -> None:
+    await message.answer("Hello!")
+
+
+@dp.message(F.text.regexp(r"\d{4}"))
+async def digit_handler(message: Message) -> None:
+    await message.answer("Есть цифры!")
 
 
 @dp.message()
