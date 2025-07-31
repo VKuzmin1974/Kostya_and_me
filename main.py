@@ -2,6 +2,9 @@ import asyncio
 import logging
 import sys
 from os import getenv
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
 
 from aiogram import Bot, Dispatcher, F, html, types
 from aiogram.client.default import DefaultBotProperties
@@ -13,6 +16,7 @@ from aiogram.types.reply_keyboard_markup import ReplyKeyboardMarkup
 
 from my_time import get_time
 from weather import get_weather, get_weather_info
+from country import get_country_info
 
 
 # Bot token can be obtained via https://t.me/BotFather
@@ -20,12 +24,17 @@ TOKEN = getenv("BOT_TOKEN")
 
 # All handlers should be attached to the Router (or Dispatcher)
 
-dp = Dispatcher()
+class Form(StatesGroup):
+    country_name = State()
+    country_info = State()
+
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
 
 
 hello_button = KeyboardButton(text="привет")
-hello_button1 = KeyboardButton(text="пока")
-keyboard = ReplyKeyboardMarkup(keyboard=[[hello_button, hello_button1], [hello_button1]])
+country_button = KeyboardButton(text="страны")
+keyboard = ReplyKeyboardMarkup(keyboard=[[hello_button, country_button], ])
 
 
 
@@ -114,6 +123,23 @@ async def handle_time(callback: types.CallbackQuery):
 @dp.message(F.text.lower() == 'привет')
 async def hello_handler(message: Message) -> None:
     await message.answer("Hello!")
+
+
+@dp.message(F.text.lower() == 'страны')
+async def country_handler(message: Message, state: FSMContext) -> None:
+    await state.set_state(Form.country_name)
+    await message.answer("Введите название страны по-английски")
+
+
+@dp.message(Form.country_name)
+async def process_country_handler(message: Message, state: FSMContext) -> None:
+    country_name = message.text.strip().lower()
+    country_info = get_country_info(country_name)
+    if country_info is None:
+        await message.answer(f"Страна: {country_name} - неизвестно")
+    # await state.set_state(Form.country_info)
+    await message.answer(f"Страна: {country_name}\n"
+                         f"столица: {country_info['capital']}")
 
 
 @dp.message(F.text.lower().contains('привет'))
